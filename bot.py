@@ -12,6 +12,7 @@ intents.guilds = True
 intents.members = True
 translator = Translator()
 
+
 async def send_message(message, user_message, is_private):
     try:
         response = responses.handle_response(user_message)
@@ -24,8 +25,6 @@ async def send_message(message, user_message, is_private):
 def run_discord_bot():
     load_dotenv()
     token = environ["DISCORD_TOKEN"]
-
-    # token = os.environ.get("DISCORD_TOKEN")
     client = discord.Client(intents=intents)
 
     @client.event
@@ -36,15 +35,11 @@ def run_discord_bot():
     # bot response for user messages
     @client.event
     async def on_message(message):
-        # if message.author == client.user:
-        #     return
-
         username = str(message.author)
         user_message = str(message.content)
         channel = str(message.channel)
 
         print(f"{username} said: '{user_message}' ({channel})")
-
         # increment o7 counter
         if user_message[0] == 'o':
             try:
@@ -77,5 +72,43 @@ def run_discord_bot():
             if re.search(language_re, en_translated.text, re.IGNORECASE):
                 message.content = "it's time"
                 await send_message(message, message.content, is_private=False)
+        if ("its" in user_message or "it's" in user_message) and ("time" in user_message):
+            await send_message(message, user_message, is_private=False)
+
+    # adding reaction roles
+    # @client.event
+    # async def on_raw_reaction_add(payload):
+    #     message_id = payload.message_id
+    #     if message_id == 1168615835837935637:
+    #         guild_id = payload.guild_id
+    #         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
+    #
+    #         if payload.emoji.name == 'inhouse':
+    #             role = discord.utils.get(guild.roles, name='in-house')
+    #         else:
+    #             role = discord.utils.get(guild.roles, name=payload.emoji.name)
+    #
+    #         if role is not None:
+    #             member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
+    #             if member is not None:
+    #                 await member.add_roles(role)
+
+    # removing reaction roles
+    # @client.event
+    # async def on_raw_reaction_remove(payload):
+    #     message_id = payload.message_id
+    #     if message_id == 1168615835837935637:
+    #         guild_id = payload.guild_id
+    #         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
+    #
+    #         if payload.emoji.name == 'inhouse':
+    #             role = discord.utils.get(guild.roles, name='in-house')
+    #         else:
+    #             role = discord.utils.get(guild.roles, name=payload.emoji.name)
+    #
+    #         if role is not None:
+    #             member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
+    #             if member is not None:
+    #                 await member.remove_roles(role)
 
     client.run(token)
