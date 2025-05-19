@@ -1,6 +1,9 @@
 time_words = [
     # English & loanwords
     "time", "taim", "taimu", "taimi", "taym", "taem", "taime",
+
+    # English RFM Speak
+    "toime", "toim", "tome",
     
     # European
     "temps", "zeit", "ora", "tempo", "tiempo", "czas", "cas", "vreme", "idő", "laikas",

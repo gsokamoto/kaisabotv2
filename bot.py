@@ -1,6 +1,7 @@
 from os import environ
 from dotenv import load_dotenv
 from googletrans import Translator
+from time_transliterations import time_words
 
 import re
 import discord
@@ -65,50 +66,19 @@ def run_discord_bot():
                 for word in user_message.split(' '):
                     language = await translator.detect(word)
                     if language.lang != 'en':
-                       break
+                        break
             en_translated = await translator.translate(user_message, 'en', language.lang)
+
             # compare with regex
-            language_re = "it(\')?s(\s)*time"
-            if re.search(language_re, en_translated.text, re.IGNORECASE):
-                message.content = "it's time"
-                await send_message(message, message.content, is_private=False)
-        if ("its" in user_message or "it's" in user_message) and ("time" in user_message):
-            await send_message(message, user_message, is_private=False)
-
-    # adding reaction roles
-    # @client.event
-    # async def on_raw_reaction_add(payload):
-    #     message_id = payload.message_id
-    #     if message_id == 1168615835837935637:
-    #         guild_id = payload.guild_id
-    #         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
-    #
-    #         if payload.emoji.name == 'inhouse':
-    #             role = discord.utils.get(guild.roles, name='in-house')
-    #         else:
-    #             role = discord.utils.get(guild.roles, name=payload.emoji.name)
-    #
-    #         if role is not None:
-    #             member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
-    #             if member is not None:
-    #                 await member.add_roles(role)
-
-    # removing reaction roles
-    # @client.event
-    # async def on_raw_reaction_remove(payload):
-    #     message_id = payload.message_id
-    #     if message_id == 1168615835837935637:
-    #         guild_id = payload.guild_id
-    #         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
-    #
-    #         if payload.emoji.name == 'inhouse':
-    #             role = discord.utils.get(guild.roles, name='in-house')
-    #         else:
-    #             role = discord.utils.get(guild.roles, name=payload.emoji.name)
-    #
-    #         if role is not None:
-    #             member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
-    #             if member is not None:
-    #                 await member.remove_roles(role)
+            if re.search("it(\')?s(\s)*time", en_translated.text, re.IGNORECASE):
+                # message.content = "it's time"
+                await send_message(message, user_message, is_private=False)
+            else:
+                # confirm if user message is using transliteration
+                for time_word in time_words:
+                    # user_message.replace(time_word, "time")
+                    if re.search("it(\')?s(\s)*time", user_message.replace(time_word, "time"), re.IGNORECASE):
+                        await send_message(message, message.content, is_private=False)
+                        break
 
     client.run(token)
